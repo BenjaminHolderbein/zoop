@@ -6,7 +6,7 @@
     {
       "name": "blip",
       "description": "Send files through the Blip app by natural language ('blip this to my mac').",
-      "source": { "type": "git", "url": "." }
+      "source": "."
     }
   ]
 }
