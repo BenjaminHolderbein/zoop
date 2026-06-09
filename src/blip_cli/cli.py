@@ -1,8 +1,8 @@
 """Command-line interface for sending files through the genuine Blip app.
 
 Subcommands:
-  list     show the signed-in account and its paired devices (+ peer ids)
-  send     send file(s) to a device by name (or by full user_id:device_id)
+  list     show the signed-in account, its devices, and known contacts (+ peer ids)
+  send     send file(s) to a device/contact by name (or by full user_id:device_id)
   doctor   print diagnostics (detected OS, state.dat path, Blip launcher)
 """
 
@@ -15,47 +15,60 @@ import sys
 from pathlib import Path
 
 from . import platforms
-from .devices import Account, Device, load_account
+from .devices import Roster, Target, load_roster
 
 
-def _load() -> Account:
-    return load_account(platforms.find_state_dat())
+def _load() -> Roster:
+    return load_roster(platforms.find_state_dat())
 
 
-def _resolve_device(account: Account, target: str) -> Device:
-    # Allow passing a full peer id (user_id:device_id) straight through.
-    if ":" in target and target.count(":") == 1:
-        uid, did = target.split(":")
-        return Device(id=did, name=target, user_id=uid)
-
-    exact = [d for d in account.devices if d.name.lower() == target.lower()]
-    matches = exact or [d for d in account.devices if target.lower() in d.name.lower()]
-    if not matches:
-        names = ", ".join(d.name for d in account.devices) or "(none)"
-        raise SystemExit(f"No device matching '{target}'. Known devices: {names}")
-    if len(matches) > 1:
-        names = ", ".join(d.name for d in matches)
-        raise SystemExit(f"'{target}' is ambiguous between: {names}")
-    return matches[0]
+def _resolve(roster: Roster, target: str) -> Target:
+    try:
+        return roster.resolve(target)
+    except LookupError as e:
+        raise SystemExit(str(e))
 
 
 def cmd_list(args: argparse.Namespace) -> int:
-    account = _load()
+    roster = _load()
     if args.json:
         print(json.dumps({
-            "user_id": account.user_id,
-            "devices": [{"id": d.id, "name": d.name, "peer": d.peer} for d in account.devices],
+            "self": _person_json(roster.self_person) if roster.self_person else None,
+            "contacts": [_person_json(p) for p in roster.contacts],
         }, indent=2))
-    else:
-        print(f"account user_id: {account.user_id}")
-        for d in account.devices:
-            print(f"  {d.name:<16} {d.peer}")
+        return 0
+
+    me = roster.self_person
+    if me:
+        print(f"you: {me.label} ({me.user_id})")
+        for d in me.devices:
+            print(f"  {d.name:<18} {d.peer}")
+    contacts = roster.contacts
+    if contacts:
+        print("contacts:")
+        for p in contacts:
+            for d in p.devices:
+                label = p.label if len(p.devices) == 1 else f"{p.label} ({d.name})"
+                print(f"  {label:<28} {d.peer}")
+    if not me and not contacts:
+        print("(no account or contacts found in state.dat)")
     return 0
 
 
+def _person_json(p) -> dict:
+    return {
+        "user_id": p.user_id,
+        "email": p.email,
+        "name": p.name,
+        "is_self": p.is_self,
+        "devices": [{"id": d.id, "name": d.name, "kind": d.kind, "peer": d.peer}
+                    for d in p.devices],
+    }
+
+
 def cmd_send(args: argparse.Namespace) -> int:
-    account = _load()
-    device = _resolve_device(account, args.to)
+    roster = _load()
+    target = _resolve(roster, args.to)
 
     files = []
     for f in args.files:
@@ -64,13 +77,13 @@ def cmd_send(args: argparse.Namespace) -> int:
             raise SystemExit(f"File not found: {f}")
         files.append(str(p.resolve()))
 
-    argv = platforms.build_send_argv(device.peer, files)
+    argv = platforms.build_send_argv(target.peer, files)
 
     if args.dry_run:
         print(" ".join(argv))
         return 0
 
-    print(f"Sending to {device.name} ({device.peer}):")
+    print(f"Sending to {target.label} ({target.peer}):")
     for f in files:
         print(f"  {f}")
     proc = subprocess.run(argv)
@@ -89,9 +102,12 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     try:
         sp = platforms.find_state_dat()
         print(f"using state.dat: {sp}")
-        account = load_account(sp)
-        print(f"account user_id: {account.user_id}")
-        print(f"devices: {', '.join(d.name for d in account.devices) or '(none)'}")
+        roster = load_roster(sp)
+        me = roster.self_person
+        if me:
+            print(f"account: {me.label} ({me.user_id})")
+            print(f"devices: {', '.join(d.name for d in me.devices) or '(none)'}")
+        print(f"contacts: {', '.join(p.label for p in roster.contacts) or '(none)'}")
     except Exception as e:  # noqa: BLE001 - diagnostics
         print(f"state.dat: ERROR: {e}")
     print(f"launcher: {' '.join(platforms.launcher_prefix())}")
@@ -102,12 +118,13 @@ def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="blip-send", description="Send files via the Blip app.")
     sub = p.add_subparsers(dest="command", required=True)
 
-    pl = sub.add_parser("list", help="list account + paired devices")
+    pl = sub.add_parser("list", help="list account, devices, and contacts")
     pl.add_argument("--json", action="store_true", help="output JSON")
     pl.set_defaults(func=cmd_list)
 
-    ps = sub.add_parser("send", help="send file(s) to a device")
-    ps.add_argument("--to", required=True, help="device name (e.g. 'MacBook Pro') or user_id:device_id")
+    ps = sub.add_parser("send", help="send file(s) to a device or contact")
+    ps.add_argument("--to", required=True,
+                    help="device/contact name (e.g. 'MacBook Pro', 'Ben') or user_id:device_id")
     ps.add_argument("files", nargs="+", help="one or more file paths")
     ps.add_argument("--dry-run", action="store_true", help="print the Blip command instead of running it")
     ps.set_defaults(func=cmd_send)

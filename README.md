@@ -20,8 +20,9 @@ blip --peer <user_id>:<device_id> --file <path> [--file <path> ...]
 Blip is single-instance: a second invocation forwards these args to the
 already-running app, which creates the transfer. This tool:
 
-1. Reads Blip's local `state.dat` (a protobuf) to map a friendly device name
-   (e.g. `MacBook Pro`) to its peer id `user_id:device_id`.
+1. Reads Blip's local `state.dat` (a protobuf) to map a friendly name — one of
+   your own devices (e.g. `MacBook Pro`) **or a contact** (e.g. `Ben`) — to its
+   peer id `user_id:device_id`.
 2. Invokes the Blip binary with `--peer` / `--file`.
 
 > Peer ids are **not** hardcoded — they're read live from `state.dat`, so they
@@ -69,8 +70,9 @@ python blip_send.py list
 ## Usage
 
 ```bash
-blip-send list                                  # show your devices + peer ids
-blip-send send --to "MacBook Pro" report.pdf    # send a file
+blip-send list                                  # show your devices + contacts + peer ids
+blip-send send --to "MacBook Pro" report.pdf    # send to one of your devices
+blip-send send --to "Ben" report.pdf            # send to a contact by name
 blip-send send --to mac a.png b.png             # partial name, multiple files
 blip-send send --to mac report.pdf --dry-run    # print the Blip command only
 blip-send doctor                                # diagnostics (paths, launcher)
@@ -80,9 +82,11 @@ blip-send doctor                                # diagnostics (paths, launcher)
 
 ## Limitations
 
-- **Own devices only (v1).** Sending to other *people* ("blip this to nick")
-  isn't supported yet — only the signed-in account's own paired devices are
-  resolvable from local data so far.
+- **Contacts must already be known locally.** You can send to your own devices
+  and to any *contact* you've already transferred with (they appear in
+  `state.dat`). Brand-new people you've never exchanged a file with are resolved
+  server-side by Blip and aren't available from local data — do one transfer with
+  them through the app first, then they're addressable by name here.
 - Rides an **undocumented** launcher flag set; a future Blip update could rename
   a flag. `blip-send doctor` plus the notes in `platforms.py` are the place to
   start if behavior changes.

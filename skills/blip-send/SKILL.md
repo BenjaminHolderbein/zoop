@@ -1,19 +1,20 @@
 ---
 name: blip-send
 description: >-
-  Send files to one of the user's own devices through the Blip file-transfer app.
-  Use this whenever the user asks to "blip" a file or send/share a file via Blip,
-  e.g. "blip this to my mac", "send report.pdf to my iphone with blip",
-  "share this file to my ipad via blip". Resolves a friendly device name to a
-  Blip peer id and dispatches the transfer through the genuine Blip app (no UI
-  driving). v1 supports the user's OWN paired devices only, not other people.
+  Send files to one of the user's own devices, or to a known contact, through the
+  Blip file-transfer app. Use this whenever the user asks to "blip" a file or
+  send/share a file via Blip, e.g. "blip this to my mac", "send report.pdf to my
+  iphone with blip", "blip this to nick". Resolves a friendly device name or
+  contact name to a Blip peer id and dispatches the transfer through the genuine
+  Blip app (no UI driving). Recipients must already exist in the local Blip state
+  (own paired devices, or contacts you've previously transferred with).
 ---
 
 # Blip a file to one of my devices
 
 This skill sends file(s) to one of the user's own Blip-paired devices (Mac,
-iPhone, iPad, PC, etc.) using a bundled cross-platform CLI. Blip must be
-installed and signed in, and ideally already running.
+iPhone, iPad, PC, etc.) or to a known contact, using a bundled cross-platform
+CLI. Blip must be installed and signed in, and ideally already running.
 
 ## How to run it
 
@@ -24,16 +25,17 @@ below use `python3`. All commands are run from any directory.
 1. **Identify the file(s)** the user means (the file they referenced or attached).
    Resolve to concrete paths. If unclear, ask which file.
 
-2. **Identify the recipient device** from the user's phrasing ("my mac" ->
-   "MacBook Pro", "my phone" -> "iPhone", etc.). If you are unsure which device
-   they mean, list the known devices first:
+2. **Identify the recipient** from the user's phrasing — one of their own devices
+   ("my mac" -> "MacBook Pro", "my phone" -> "iPhone") or a contact by name
+   ("nick", "Ben"). If you are unsure who/what they mean, list known recipients
+   first (the output shows your devices and your contacts):
 
    ```
    python3 "${CLAUDE_PLUGIN_ROOT}/blip_send.py" list
    ```
 
-3. **Send**, passing the device name to `--to` (partial, case-insensitive names
-   work, e.g. `--to mac`):
+3. **Send**, passing the device or contact name to `--to` (partial,
+   case-insensitive names work, e.g. `--to mac` or `--to ben`):
 
    ```
    python3 "${CLAUDE_PLUGIN_ROOT}/blip_send.py" send --to "MacBook Pro" "/path/to/file"
@@ -47,12 +49,13 @@ below use `python3`. All commands are run from any directory.
 
 ## Important behavior
 
-- **Own devices only (v1).** If the requested recipient is a *person* (e.g.
-  "blip this to nick"), this is not supported yet — tell the user that
-  person-to-person sending is not implemented and offer to send to one of their
-  own devices instead.
-- If `--to` matches no device, the CLI prints the known device names; relay them
-  and ask the user to pick.
+- **Recipients must already be known locally.** You can send to the user's own
+  devices and to any contact they've previously transferred with (these appear in
+  `list`). If the requested person isn't known yet, tell the user that brand-new
+  people aren't addressable from local data — they should do one transfer with
+  that person through the Blip app first, then the contact becomes resolvable here.
+- If `--to` matches no recipient, the CLI prints the known device and contact
+  names; relay them and ask the user to pick.
 - If the CLI reports it cannot find `state.dat` or the Blip binary, run
   `python3 "${CLAUDE_PLUGIN_ROOT}/blip_send.py" doctor` and share the output —
   on macOS/Linux the install paths may differ and can be set via the `BLIP_STATE`
