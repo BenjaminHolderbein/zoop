@@ -1,30 +1,30 @@
 ---
 description: >-
   Send a local file to one of the user's own devices or a known contact via the
-  Blip file-transfer app. Use when the user asks to "blip" a file or send/share a
-  file via Blip (e.g. "blip this to my mac", "send report.pdf to my iphone with
-  blip", "blip this to ben").
+  Blip file-transfer app. Use when the user asks to "zoop" or "blip" a file or
+  send/share a file via Blip (e.g. "zoop this to my mac", "blip this to my iphone",
+  "send report.pdf to my iphone with blip", "zoop this to ben").
 alwaysApply: false
 ---
 
-# Blip a file to a device or contact
+# Zoop a file to a device or contact
 
 Send file(s) to one of the user's Blip-paired devices (Mac, iPhone, iPad, PC, …)
-or a known contact, using the `blip-send` CLI. Blip must be installed and signed
+or a known contact, using the `zoop` CLI. Blip must be installed and signed
 in, and ideally already running.
 
-**Prerequisite:** `blip-send` on PATH —
-`pipx install git+https://github.com/BenjaminHolderbein/blip-cli`. Verify with
-`blip-send doctor`.
+**Prerequisite:** `zoop` on PATH —
+`pipx install git+https://github.com/BenjaminHolderbein/zoop`. Verify with
+`zoop doctor`.
 
 Steps:
 
 1. Identify the file(s) the user means; resolve to concrete paths. If unclear,
    ask which file.
 2. Identify the recipient from their phrasing ("my mac" -> "MacBook Pro", a
-   contact like "Ben"). If unsure, list known recipients first: `blip-send list`.
+   contact like "Ben"). If unsure, list known recipients first: `zoop list`.
 3. Send (partial, case-insensitive names work):
-   `blip-send send --to "MacBook Pro" "/path/to/file"`. Multiple files: list them
+   `zoop send --to "MacBook Pro" "/path/to/file"`. Multiple files: list them
    all after `send`. A full `user_id:device_id` peer id also works for `--to`.
 4. Relay the result; the user may need to accept the transfer on the receiving
    device.
@@ -32,10 +32,10 @@ Steps:
 Behavior:
 
 - Recipients must already exist locally (own devices, or contacts you've
-  transferred with before — see `blip-send list`). Brand-new people aren't
+  transferred with before — see `zoop list`). Brand-new people aren't
   addressable from local data; tell the user to do one transfer with them through
   the Blip app first.
 - If `--to` matches nothing, the CLI lists known names — relay them and ask.
 - `--dry-run` (after `send`) shows what would be sent without sending.
-- Troubleshoot with `blip-send doctor`; override paths via `BLIP_STATE`,
+- Troubleshoot with `zoop doctor`; override paths via `BLIP_STATE`,
   `BLIP_BIN` (Windows/Linux), or `BLIP_SOCK` (macOS).

@@ -1,8 +1,8 @@
-# blip-cli
+# zoop
 
-Send files through the [Blip](https://blip.net) file-transfer app from the
-command line — and, via the bundled Claude Code plugin, by just saying
-**"blip this to my mac."**
+An unofficial CLI for [Blip](https://blip.net): send files through the genuine
+Blip app from the command line, or, via the bundled Claude Code plugin, by just
+saying **"zoop this to my mac."** (It still answers to *"blip this,"* too.)
 
 Blip has no public API or CLI of its own. This project drives the **genuine Blip
 app** through the same local interfaces it already uses — so the polished receive
@@ -32,7 +32,7 @@ local interface on each:
   `TransferCreateRequested` → `TransferAddContentRequested` →
   `TransferInviteRequested` — which is exactly what the app's own UI does. This
   is implemented in pure stdlib (no protobuf/grpc deps); see
-  [`src/blip_cli/macsend.py`](src/blip_cli/macsend.py).
+  [`src/zoop/macsend.py`](src/zoop/macsend.py).
 
 ## Platform support
 
@@ -42,7 +42,7 @@ local interface on each:
 | macOS   | ✅ Verified   | `net.blip.macos` build; native DRPC socket. |
 | Linux   | 🧪 Best-effort | Candidate paths shipped; **PRs welcome**. |
 
-Per-OS specifics live in one file: [`src/blip_cli/platforms.py`](src/blip_cli/platforms.py).
+Per-OS specifics live in one file: [`src/zoop/platforms.py`](src/zoop/platforms.py).
 If Blip is installed somewhere unexpected, override discovery with the
 `BLIP_STATE` (path to `state.dat`), `BLIP_BIN` (Blip binary, win/linux), or
 `BLIP_SOCK` (DRPC socket, macOS) environment variables — no code change needed.
@@ -52,17 +52,17 @@ If Blip is installed somewhere unexpected, override discovery with the
 ### As a Claude Code plugin (natural language)
 
 ```
-/plugin marketplace add BenjaminHolderbein/blip-cli
-/plugin install blip@blip-cli
+/plugin marketplace add BenjaminHolderbein/zoop
+/plugin install zoop@zoop
 ```
 
-Then in any conversation: *"blip this file to my iPad"*, *"send report.pdf to my
+Then in any conversation: *"zoop this file to my iPad"*, *"send report.pdf to my
 mac with blip"*. (Requires Python 3.8+ on PATH.)
 
 ### As a standalone CLI
 
 ```
-pipx install git+https://github.com/BenjaminHolderbein/blip-cli
+pipx install git+https://github.com/BenjaminHolderbein/zoop
 # or, from a checkout:
 pip install .
 ```
@@ -70,14 +70,14 @@ pip install .
 …or run with zero install from a checkout:
 
 ```
-python blip_send.py list
+python zoop.py list
 ```
 
 ### Other harnesses (Codex, Cursor, …)
 
 The Claude Code plugin bundles everything; other agents use the same engine via a
 small per-harness shim. Install the CLI once (`pipx install
-git+https://github.com/BenjaminHolderbein/blip-cli`), then drop in the shim for
+git+https://github.com/BenjaminHolderbein/zoop`), then drop in the shim for
 your tool:
 
 - **Codex** — an Agent Skill: [`integrations/codex`](integrations/codex)
@@ -89,15 +89,15 @@ is documented in [`integrations/`](integrations/README.md).
 ## Usage
 
 ```bash
-blip-send list                                  # show your devices + contacts + peer ids
-blip-send send --to "MacBook Pro" report.pdf    # send to one of your devices
-blip-send send --to "Ben" report.pdf            # send to a contact by name
-blip-send send --to mac a.png b.png             # partial name, multiple files
-blip-send send --to mac report.pdf --dry-run    # print what would be sent only
-blip-send doctor                                # diagnostics (paths, transport)
+zoop list                                  # show your devices + contacts + peer ids
+zoop send --to "MacBook Pro" report.pdf    # send to one of your devices
+zoop send --to "Ben" report.pdf            # send to a contact by name
+zoop send --to mac a.png b.png             # partial name, multiple files
+zoop send --to mac report.pdf --dry-run    # print what would be sent only
+zoop doctor                                # diagnostics (paths, transport)
 ```
 
-(`python blip_send.py <args>` works identically without installing.)
+(`python zoop.py <args>` works identically without installing.)
 
 ## Limitations
 
@@ -108,16 +108,16 @@ blip-send doctor                                # diagnostics (paths, transport)
   them through the app first, then they're addressable by name here.
 - Rides **undocumented** local interfaces (the launcher flags on Windows/Linux,
   the DRPC `Dispatch` events on macOS); a future Blip update could change either.
-  `blip-send doctor` plus the notes in `platforms.py` / `macsend.py` are the
+  `zoop doctor` plus the notes in `platforms.py` / `macsend.py` are the
   place to start if behavior changes.
 
 ## Contributing (esp. macOS / Linux)
 
 1. Install + sign in to Blip.
-2. Run `python blip_send.py doctor` and see which candidate paths are found.
+2. Run `python zoop.py doctor` and see which candidate paths are found.
 3. If `state.dat` or the binary isn't found, add the correct path to
    `state_dat_candidates()` / `launcher_prefix()` in
-   [`src/blip_cli/platforms.py`](src/blip_cli/platforms.py).
+   [`src/zoop/platforms.py`](src/zoop/platforms.py).
 4. Verify with `... send --to <device> <file> --dry-run`, then a real send.
 5. Open a PR updating the support table above.
 

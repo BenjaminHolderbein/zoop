@@ -1,10 +1,10 @@
 {
   "version": "1",
-  "name": "blip-cli",
+  "name": "zoop",
   "owner": { "name": "Benjamin Holderbein" },
   "plugins": [
     {
-      "name": "blip",
+      "name": "zoop",
       "description": "Send files through the Blip app by natural language ('blip this to my mac').",
       "source": "."
     }

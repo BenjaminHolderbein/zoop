@@ -15,7 +15,7 @@ A send is three dispatched events::
 Each ``DispatchRequest.event`` is a ``google.protobuf.Any`` wrapping the event.
 We hand-roll the (small, fixed) protobuf and DRPC framing so this stays pure
 stdlib — no protobuf/grpc/drpc dependencies. Wire format reverse-engineered from
-the shipping app (see Heap notes / memory ``blip-cli-mac-internals``).
+the shipping app (see Heap notes / memory ``zoop-mac-internals``).
 """
 
 from __future__ import annotations

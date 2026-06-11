@@ -82,8 +82,9 @@ def cmd_send(args: argparse.Namespace) -> int:
         from . import macsend
         user_id, _, device_id = target.peer.partition(":")
         if args.dry_run:
-            print(f"drpc {platforms.find_socket(launch=False)} -> "
-                  f"Dispatch TransferCreate/AddContent/Invite to {target.peer}")
+            sock = next(iter(platforms.socket_candidates()), "<blip core socket>")
+            print(f"drpc {sock} -> Dispatch "
+                  f"TransferCreate/AddContent/Invite to {target.peer}")
             return 0
         print(f"Sending to {target.label} ({target.peer}):")
         for f in files:
@@ -141,7 +142,7 @@ def cmd_doctor(args: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="blip-send", description="Send files via the Blip app.")
+    p = argparse.ArgumentParser(prog="zoop", description="Send files via the Blip app.")
     sub = p.add_subparsers(dest="command", required=True)
 
     pl = sub.add_parser("list", help="list account, devices, and contacts")

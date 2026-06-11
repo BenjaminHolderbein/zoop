@@ -1,16 +1,17 @@
 ---
-name: blip-send
+name: zoop
 description: >-
   Send files to one of the user's own devices, or to a known contact, through the
-  Blip file-transfer app. Use this whenever the user asks to "blip" a file or
-  send/share a file via Blip, e.g. "blip this to my mac", "send report.pdf to my
-  iphone with blip", "blip this to nick". Resolves a friendly device name or
-  contact name to a Blip peer id and dispatches the transfer through the genuine
-  Blip app (no UI driving). Recipients must already exist in the local Blip state
-  (own paired devices, or contacts you've previously transferred with).
+  Blip file-transfer app. Use this whenever the user asks to "zoop" or "blip" a
+  file or to send/share a file via Blip, e.g. "zoop this to my mac", "blip this to
+  my iphone", "send report.pdf to my iphone with blip", "zoop this to nick".
+  Resolves a friendly device name or contact name to a Blip peer id and dispatches
+  the transfer through the genuine Blip app (no UI driving). Recipients must
+  already exist in the local Blip state (own paired devices, or contacts you've
+  previously transferred with).
 ---
 
-# Blip a file to one of my devices
+# Zoop a file to one of my devices
 
 This skill sends file(s) to one of the user's own Blip-paired devices (Mac,
 iPhone, iPad, PC, etc.) or to a known contact, using a bundled cross-platform
@@ -31,14 +32,14 @@ below use `python3`. All commands are run from any directory.
    first (the output shows your devices and your contacts):
 
    ```
-   python3 "${CLAUDE_PLUGIN_ROOT}/blip_send.py" list
+   python3 "${CLAUDE_PLUGIN_ROOT}/zoop.py" list
    ```
 
 3. **Send**, passing the device or contact name to `--to` (partial,
    case-insensitive names work, e.g. `--to mac` or `--to ben`):
 
    ```
-   python3 "${CLAUDE_PLUGIN_ROOT}/blip_send.py" send --to "MacBook Pro" "/path/to/file"
+   python3 "${CLAUDE_PLUGIN_ROOT}/zoop.py" send --to "MacBook Pro" "/path/to/file"
    ```
 
    Multiple files: list them all after `send`. A full peer id
@@ -57,7 +58,7 @@ below use `python3`. All commands are run from any directory.
 - If `--to` matches no recipient, the CLI prints the known device and contact
   names; relay them and ask the user to pick.
 - If the CLI reports it cannot find `state.dat` or the Blip binary, run
-  `python3 "${CLAUDE_PLUGIN_ROOT}/blip_send.py" doctor` and share the output —
+  `python3 "${CLAUDE_PLUGIN_ROOT}/zoop.py" doctor` and share the output —
   on macOS/Linux the install paths may differ and can be set via the `BLIP_STATE`
   and `BLIP_BIN` environment variables.
 - Use `--dry-run` (after `send`) to show the exact Blip command without sending,

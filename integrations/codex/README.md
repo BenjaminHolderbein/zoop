@@ -11,27 +11,27 @@ just the engine + a skill file.
 1. **Engine** (one-time, on PATH):
 
    ```
-   pipx install git+https://github.com/BenjaminHolderbein/blip-cli
-   blip-send doctor      # verify it finds Blip
+   pipx install git+https://github.com/BenjaminHolderbein/zoop
+   zoop doctor      # verify it finds Blip
    ```
 
 2. **Skill** — copy this skill into your Codex skills directory:
 
    ```
    # global (available in every Codex session):
-   cp -r skills/blip-send ~/.codex/skills/
+   cp -r skills/zoop ~/.codex/skills/
 
    # or, per-repo: Codex auto-discovers skills under .agents/skills/
-   cp -r skills/blip-send /path/to/your/repo/.agents/skills/
+   cp -r skills/zoop /path/to/your/repo/.agents/skills/
    ```
 
-   (On Windows, copy the `skills/blip-send` folder into
+   (On Windows, copy the `skills/zoop` folder into
    `%USERPROFILE%\.codex\skills\`.)
 
 ## Use
 
 In Codex: *"blip this file to my iPhone"*, *"send report.pdf to my mac with
-blip"*. Codex activates the skill and runs `blip-send` for you. You can also use
+blip"*. Codex activates the skill and runs `zoop` for you. You can also use
 `/skills` to pick it explicitly.
 
 ## Notes

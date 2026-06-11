@@ -3,7 +3,7 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "blip-cli"
+name = "zoop-cli"
 version = "0.1.0"
 description = "Send files through the genuine Blip app from the command line (cross-platform)."
 readme = "README.md"
@@ -18,11 +18,11 @@ classifiers = [
 ]
 
 [project.scripts]
-blip-send = "blip_cli.cli:main"
+zoop = "zoop.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/BenjaminHolderbein/blip-cli"
-Repository = "https://github.com/BenjaminHolderbein/blip-cli"
+Homepage = "https://github.com/BenjaminHolderbein/zoop"
+Repository = "https://github.com/BenjaminHolderbein/zoop"
 
 [tool.setuptools.packages.find]
 where = ["src"]

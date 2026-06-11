@@ -12,8 +12,8 @@ matches).
 1. **Engine** (one-time, on PATH):
 
    ```
-   pipx install git+https://github.com/BenjaminHolderbein/blip-cli
-   blip-send doctor      # verify it finds Blip
+   pipx install git+https://github.com/BenjaminHolderbein/zoop
+   zoop doctor      # verify it finds Blip
    ```
 
 2. **Rule** — copy the rule into the project where you want it (rules live under
@@ -21,7 +21,7 @@ matches).
 
    ```
    mkdir -p /path/to/your/repo/.cursor/rules
-   cp rules/blip-send.mdc /path/to/your/repo/.cursor/rules/
+   cp rules/zoop.mdc /path/to/your/repo/.cursor/rules/
    ```
 
    For a global rule available in every project, add it via Cursor Settings →
@@ -30,7 +30,7 @@ matches).
 ## Use
 
 In Cursor's Agent: *"blip this file to my iPhone"*, *"send report.pdf to my mac
-with blip"*. The rule activates on the description match and runs `blip-send`.
+with blip"*. The rule activates on the description match and runs `zoop`.
 
 ## Notes
 

@@ -12,7 +12,7 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), "src"))
 
-from blip_cli.devices import parse_state  # noqa: E402
+from zoop.devices import parse_state  # noqa: E402
 
 USER_ID = "11111111-1111-4111-8111-111111111111"
 DEV_A = "22222222-2222-4222-8222-222222222222"

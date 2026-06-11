@@ -7,7 +7,7 @@ The two send mechanisms differ by OS:
   ``--peer <user_id>:<device_id> --file <path>`` forwards the request to the
   already-running single instance. See :func:`build_send_argv`.
 * macOS has no such CLI. Its background core instead serves a DRPC socket in the
-  App Group container; we talk to it directly (see :mod:`blip_cli.macsend`).
+  App Group container; we talk to it directly (see :mod:`zoop.macsend`).
   :func:`find_socket` locates that socket.
 
 Per-OS knowledge is isolated here:
@@ -152,8 +152,11 @@ def socket_candidates() -> list[Path]:
     if env:
         return [_expand(env)]
     if sys.platform == "darwin":
+        # Glob the App Group container dir (not the sock itself) so we report the
+        # expected path even when Blip is closed and the socket doesn't exist yet.
         gc = Path.home() / "Library" / "Group Containers"
-        return [Path(p) for p in sorted(glob.glob(str(gc / "*.blip" / "Library" / "Caches" / "sock")))]
+        return [Path(d) / "Library" / "Caches" / "sock"
+                for d in sorted(glob.glob(str(gc / "*.blip")))]
     return []
 
 
